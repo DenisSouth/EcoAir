@@ -1,0 +1,5 @@
+create gitignore*
+cmd*
+md to folder *
+
+type nul > .gitignore
