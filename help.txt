@@ -3,3 +3,24 @@ cmd*
 md to folder *
 
 type nul > .gitignore
+
+
+git init
+git add .
+git status
+git commit -m "pms3003+arduino"
+git remote add origin https://github.com/FabLabTC/EcoAir.git
+git push -u origin master
+
+
+…or create a new repository on the command line
+echo "# EcoAir" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/FabLabTC/EcoAir.git
+git push -u origin master
+…or push an existing repository from the command line
+
+git remote add origin https://github.com/FabLabTC/EcoAir.git
+git push -u origin master
