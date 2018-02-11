@@ -24,3 +24,13 @@ git push -u origin master
 
 git remote add origin https://github.com/FabLabTC/EcoAir.git
 git push -u origin master
+
+
+git clone https://github.com/FabLabTC/EcoAir.git
+add some...
+git status
+git add .
+git commit -m "add help"
+
+git remote add origin https://github.com/FabLabTC/EcoAir.git
+git push -u origin master
