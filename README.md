@@ -14,11 +14,3 @@
 <h3>Software</h3>
 Arduino IDE
 
-<h3>Files</h3>
-pms3003.ino - code for Arduino Uno and Air Quality Sensor Plantower PMS3003<br>
-It allows to send data to console<br>
-NodePms - send PMS and co2 data to web server on NodeMCU<br>
-ReadPMS - send PMS data to console NodeMCU<br>
-WiFiWebServer - allow to no/off Led on  NodeMCU by webpage<br>
-HTTPSRequestTbot - allow to send some data to Telegram<br>
-NodeAir - fully functional telegram bot + co2 + pms

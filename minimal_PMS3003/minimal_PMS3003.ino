@@ -1,14 +1,13 @@
-//Code for Arduino Uno and Air Quality Sensor Plantower PMS3003 
 //  PMS3003     Arduino(UNO)
 //  PIN1        5V
 //  PIN2        GND
-//  PIN4        TX Pin 5
-//  PIN5        RX Pin 4
+//  PIN4 TX     Pin 5 //used
+//  PIN5 RX     Pin 4 //not used
 
-#define SERIAL_BAUD_RATE 9600
+#define SERIAL_BAUD_RATE 115200
 #define READING_SENSOR_INTERVAL 5000  // Interval to read  sensors. 
-#define PMS3003_RX_PIN 4
-#define PMS3003_TX_PIN 5
+#define PMS3003_RX_PIN 5
+#define PMS3003_TX_PIN 4
 
 #include <SoftwareSerial.h>
 SoftwareSerial PMS3003Serial(PMS3003_RX_PIN, PMS3003_TX_PIN);
@@ -29,77 +28,35 @@ boolean firstLoop = true;
 
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
-  initPMS3003(); // initialize PMS3003
+  PMS3003Serial.begin(9600); // initialize PMS3003
   firstLoop = true;
 }
 
 void loop() {
   readPMS3003();
-  /*  Serial.println("Atm PM1   " + String(pmcf10) +  " mkg/m3");
-    Serial.println("Atm PM2.5 " + String(pmcf25) +  " mkg/m3" );
-    Serial.println("Atm PM10  " + String(pmcf100)+  " mkg/m3" );
-    Serial.println("Part PM1  " + String(pmat10)+  " mkg/m3" );
-    Serial.println("Part PM2  " + String(pmat25) +  " mkg/m3");
-    Serial.println("Part PM10 " + String(pmat100) +  " mkg/m3");
-     Serial.println(""  );*/
+  Serial.println("PM1   " + String(pmcf10) +  " mkg/m3");
+  Serial.println("PM2.5 " + String(pmcf25) +  " mkg/m3" );
+  Serial.println("PM10  " + String(pmcf100)+  " mkg/m3" );
+  
+ Serial.print("2.5 " );
+ if ( pmcf25 >= 0 && pmcf25 < 50) { Serial.println("Good"); }
+ if ( pmcf25 >= 51 && pmcf25 < 100) { Serial.println("Moderate"); }
+ if ( pmcf25 >= 101 && pmcf25 < 150) { Serial.println("Unhealthy for Sensitive Groups"); }
+ if ( pmcf25 >= 151 && pmcf25 < 200) { Serial.println("Unhealthy"); }
+ if ( pmcf25 >= 201 && pmcf25 < 300) { Serial.println("Very Unhealthy"); }
+ if ( pmcf25 >= 301) { Serial.println("Hazardous"); } 
 
-  Serial.println("PM1     " + String(pmcf10) +  "  " + String(pmat10));
-  Serial.println("PM2.5   " + String(pmcf25) +  "  " + String(pmat25));
-  Serial.println("PM10    " + String(pmat100) +  "  " + String(pmat100));
-
-
-  Serial.print("2.5 "  );
-
-  if ( pmcf25 >= 0 && pmcf25 < 50) {
-    Serial.println("Good");
-  }
-  if ( pmcf25 >= 51 && pmcf25 < 100) {
-    Serial.println("Moderate");
-  }
-  if ( pmcf25 >= 101 && pmcf25 < 150) {
-    Serial.println("Unhealthy for Sensitive Groups");
-  }
-  if ( pmcf25 >= 151 && pmcf25 < 200) {
-    Serial.println("Unhealthy");
-  }
-  if ( pmcf25 >= 201 && pmcf25 < 300) {
-    Serial.println("Very Unhealthy");
-  }
-  if ( pmcf25 >= 301) {
-    Serial.println("Hazardous");
-  }
-
-  //////////////////////////////////////////
-  Serial.print("10 "  );
-  if ( pmat100 >= 0 && pmat100 < 54) {
-    Serial.println("Good");
-  }
-  if ( pmat100 >= 55 && pmat100 < 154) {
-    Serial.println("Moderate");
-  }
-  if ( pmat100 >= 155 && pmat100 < 254) {
-    Serial.println("Unhealthy for Sensitive Groups");
-  }
-  if ( pmat100 >= 255 && pmat100 < 354) {
-    Serial.println("Unhealthy");
-  }
-  if ( pmat100 >= 355 && pmat100 < 424) {
-    Serial.println("Very Unhealthy");
-  }
-  if ( pmat100 >= 425) {
-    Serial.println("Hazardous");
-  }
-
-  Serial.println(""  );
-
+ Serial.print("10 " );
+ if ( pmat100 >= 0 && pmat100 < 54) { Serial.println("Good"); }
+ if ( pmat100 >= 55 && pmat100 < 154) { Serial.println("Moderate"); }
+ if ( pmat100 >= 155 && pmat100 < 254) { Serial.println("Unhealthy for Sensitive Groups"); }
+ if ( pmat100 >= 255 && pmat100 < 354) { Serial.println("Unhealthy"); }
+ if ( pmat100 >= 355 && pmat100 < 424) { Serial.println("Very Unhealthy"); }
+ if ( pmat100 >= 425) { Serial.println("Hazardous");}
+ Serial.println("" );
 
   delay(READING_SENSOR_INTERVAL);
   firstLoop = false;
-}
-
-// Initialize the PMS3003 sensor
-void initPMS3003() {
-  PMS3003Serial.begin(SERIAL_BAUD_RATE);
 }
 
 // Read value from PMS3003
