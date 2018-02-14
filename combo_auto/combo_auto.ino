@@ -4,7 +4,7 @@
 #include <UniversalTelegramBot.h>
 char ssid[] = "AndroidAP";     // your network SSID (name)
 char password[] = "12345777"; // your network key
-#define BOTtoken "469253688:AAFg4EKAG0QXD5TL574_UqMZRQWa7wjL43c"  // your Bot Token (Get from Botfather)
+#define BOTtoken "526357899:AAHBHTnCqcXLjfnrY9ITOVGEMdWdRgBmdW4"  // your Bot Token (Get from Botfather)
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
 int Bot_mtbs = 1000; //mean time between scan messages
@@ -55,7 +55,7 @@ String AutoSend;
 
 String SensorData;
 
-String my_chat_id ="-157602763";
+String my_chat_id ="292126439";
 
 /////////////////////////////void setup////////////////////////////////void setup
 void setup() {
@@ -106,7 +106,7 @@ digitalWrite(Green_LED, HIGH);  //led off
   Serial.println("Start");
     String chat_id = String(bot.messages[0].chat_id);
     if (chat_id == "") chat_id =  my_chat_id;
-    bot.sendMessage(chat_id, "Start");
+    bot.sendMessage(chat_id, "Welcome\n For manual update use \n /sensor" );
 }
 
 
@@ -222,8 +222,11 @@ void handleNewMessages(int numNewMessages)
     String from_name = bot.messages[i].from_name;
     if (from_name == "") from_name = "Guest";
 
-    if (text == "/start") {
+    if (text == "/sensor") {
       bot.sendMessage(chat_id, SensorData);
+
+       Serial.println("chat_id " + chat_id);
+       
     }
   }
 }
