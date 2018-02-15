@@ -3,8 +3,8 @@
 #include <UniversalTelegramBot.h>
 
 char ssid[] = "AndroidAP";     // your network SSID (name)
-char password[] = "12345777"; // your network key
-#define BOTtoken "469253688:AAFg4EKAG0QXD5TL574_UqMZRQWa7wjL43c"  // your Bot Token (Get from Botfather)
+char password[] = "1234567"; // your network key
+#define BOTtoken "FFFFFFFFF:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"  // your Bot Token (Get from Botfather)
 
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);

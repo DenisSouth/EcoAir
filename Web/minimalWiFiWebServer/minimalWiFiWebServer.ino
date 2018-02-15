@@ -9,11 +9,8 @@
 
 #include <ESP8266WiFi.h>
 
-//const char* ssid = "MYFABLAB";
-//const char* password = "fab17chile";
-
 const char* ssid = "AndroidAP";
-const char* password = "12345777";
+const char* password = "1234567";
 
 const int AnalogIn  = A0;
 

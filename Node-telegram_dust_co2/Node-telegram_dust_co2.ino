@@ -3,8 +3,8 @@
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
 char ssid[] = "AndroidAP";     // your network SSID (name)
-char password[] = "12345777"; // your network key
-#define BOTtoken "469253688:AAFg4EKAG0QXD5TL574_UqMZRQWa7wjL43c"  // your Bot Token (Get from Botfather)
+char password[] = "12345678"; // your network key
+#define BOTtoken "ZZZZZZZZZZZZZZ:ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZz"  // your Bot Token (Get from Botfather)
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
 int Bot_mtbs = 1000; //mean time between scan messages
@@ -42,10 +42,43 @@ uint8_t PMS3003_buf[PMS3003_DATALEN];
 boolean firstLoop = true;
 //PMS3003
 
+//LED
+#define Red_LED 12
+#define Blue_LED 13
+#define Green_LED 14
+//LED
+
+int ChangeTrackingOld = 0;
+int ChangeTrackingNew = 0;
+
+String AutoSend;
+
 String SensorData;
+
+String my_chat_id ="292126439";
 
 /////////////////////////////void setup////////////////////////////////void setup
 void setup() {
+
+
+//LED
+pinMode(Red_LED, OUTPUT);
+pinMode(Blue_LED, OUTPUT);
+pinMode(Green_LED, OUTPUT);
+
+LED ("Red");
+delay(500);
+LED ("Blue");
+delay(500);  
+LED ("Green");
+delay(500);  
+
+digitalWrite(Red_LED, HIGH); //led off
+digitalWrite(Blue_LED, HIGH);  //led off
+digitalWrite(Green_LED, HIGH);  //led off
+//LED
+
+
   Serial.begin(115200);
 //telegram
   WiFi.mode(WIFI_STA);
@@ -68,7 +101,12 @@ void setup() {
   PMS3003Serial.begin(9600); // initialize PMS3003
   firstLoop = true;
 //PMS3003
- 
+
+
+  Serial.println("Start");
+    String chat_id = String(bot.messages[0].chat_id);
+    if (chat_id == "") chat_id =  my_chat_id;
+    bot.sendMessage(chat_id, "Welcome\n For manual update use \n /sensor" );
 }
 
 
@@ -106,11 +144,58 @@ SensorData = SensorData + " mkg/m3 \n PM2.5 ";
   if ( pmcf100 >= 425) {    SensorData = SensorData + "Hazardous";  }
 
  SensorData = SensorData + "\n CO2 " + ppm;
+  if( ppm >= 0 && ppm < 0.25) { SensorData = SensorData + " Normal";}
+  if( ppm >= 0.26 && ppm < 1) { SensorData = SensorData + " Attention";}
+  if( ppm >= 1 ){ SensorData = SensorData + " Hazard";};
+
 
  delay(1000); //READING_SENSOR_INTERVAL
  firstLoop = false;
 //PMS3003
+
+
+//limit checking
+//Normal
+  if (( pmcf25 >= 0 && pmcf25 < 50)    || ( pmcf100 >= 0 && pmcf100 < 54)    || ( ppm >= 0 && ppm < 0.25) )  //Normal
+  {
+    LED ("Green");
+    ChangeTrackingNew = 1;
+
+    AutoSend = "It back to normal \n \n" + SensorData;
+  } 
   
+//Attention
+  if (( pmcf25 >= 51 && pmcf25 < 150)  || ( pmcf100 >= 55 && pmcf100 < 254)  || ( ppm >= 0.26 && ppm < 1) ) //Attention
+  {
+    LED ("Blue");
+    ChangeTrackingNew = 2;
+    AutoSend = "Attention \n \n" + SensorData;
+   }
+   
+//Hazard
+  if (( pmcf25 >= 151) || ( pmcf100 >= 255 ) || ( ppm >= 1 )) //Hazard
+  {
+    LED ("Red");
+    ChangeTrackingNew = 3;
+     AutoSend = "Hazard \n \n" + SensorData;
+   }
+
+   
+//limit checking
+//change checking
+
+if (ChangeTrackingNew != ChangeTrackingOld)
+{
+  Serial.println("AutoSend");
+    String chat_id = String(bot.messages[0].chat_id);
+    if (chat_id == "") chat_id =  my_chat_id;
+    bot.sendMessage(chat_id, AutoSend);
+}
+
+ChangeTrackingOld = ChangeTrackingNew;
+//change checking
+
+
   //telegram
     if (millis() > Bot_lasttime + Bot_mtbs)  {
       int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
@@ -137,8 +222,11 @@ void handleNewMessages(int numNewMessages)
     String from_name = bot.messages[i].from_name;
     if (from_name == "") from_name = "Guest";
 
-    if (text == "/start") {
+    if (text == "/sensor") {
       bot.sendMessage(chat_id, SensorData);
+
+       Serial.println("chat_id " + chat_id);
+       
     }
   }
 }
@@ -184,4 +272,27 @@ void readPMS3003() {
 }
 ////////////////////Read value from PMS3003////////////////////Read value from PMS3003
 
-
+///////////////////////led////////////////////////////////////////////////////////
+void LED(String ledname) 
+{
+      if (ledname == "Red")
+    {digitalWrite(Red_LED, LOW); //led off
+    digitalWrite(Blue_LED, HIGH);  //led off
+    digitalWrite(Green_LED, HIGH);  //led off
+    }
+        
+        if (ledname == "Green")
+    {
+    digitalWrite(Red_LED, HIGH); //led off
+    digitalWrite(Blue_LED, HIGH);  //led off
+    digitalWrite(Green_LED, LOW);  //led off
+    }
+    
+      if (ledname == "Blue")
+    {
+    digitalWrite(Red_LED, HIGH); //led off
+    digitalWrite(Blue_LED, LOW);  //led off
+    digitalWrite(Green_LED, HIGH);  //led off
+    }
+}
+///////////////////////led////////////////////////////////////////////////////////
