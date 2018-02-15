@@ -1,3 +1,14 @@
+//Temp sensor
+//default i2c
+// -SDA = D2 
+// -SCL = D1
+
+#include <Wire.h>
+#include "SHT20.h"
+SHT20    sht20;
+//Temp sensor
+
+
 //telegram
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
@@ -26,8 +37,8 @@ MQ135 gasSensor = MQ135(A0);
 //  PIN4 TX     Pin 5 //used 3.3v logic
 //  PIN5 RX     Pin 4 //not used 3.3v logic
 
-#define PMS3003_RX_PIN 5
-#define PMS3003_TX_PIN 4
+#define PMS3003_RX_PIN 0
+#define PMS3003_TX_PIN 2
 #include <SoftwareSerial.h>
 SoftwareSerial PMS3003Serial(PMS3003_RX_PIN, PMS3003_TX_PIN);
 int pmcf10 = 0; // PM1.0  In the Atmosphere
@@ -55,11 +66,15 @@ String AutoSend;
 
 String SensorData;
 
-String my_chat_id ="292126439";
+//String my_chat_id ="292126439";
 
 /////////////////////////////void setup////////////////////////////////void setup
 void setup() {
-
+// SHT20
+sht20.initSHT20();
+delay(100);
+sht20.checkSHT20();
+// SHT20
 
 //LED
 pinMode(Red_LED, OUTPUT);
@@ -78,8 +93,8 @@ digitalWrite(Blue_LED, HIGH);  //led off
 digitalWrite(Green_LED, HIGH);  //led off
 //LED
 
-
   Serial.begin(115200);
+  
 //telegram
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
@@ -88,8 +103,8 @@ digitalWrite(Green_LED, HIGH);  //led off
   Serial.println(ssid);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
-    delay(500);
+  Serial.print(".");
+  delay(500);
   }
   Serial.println("");
   Serial.println("WiFi connected");
@@ -98,74 +113,66 @@ digitalWrite(Green_LED, HIGH);  //led off
 //telegram
 
 //PMS3003
-  PMS3003Serial.begin(9600); // initialize PMS3003
-  firstLoop = true;
+PMS3003Serial.begin(9600); // initialize PMS3003
+firstLoop = true;
 //PMS3003
-
-
-  Serial.println("Start");
-    String chat_id = String(bot.messages[0].chat_id);
-    if (chat_id == "") chat_id =  my_chat_id;
-    bot.sendMessage(chat_id, "Welcome\n For manual update use \n /sensor" );
 }
-
 
 /////////////////////////////void loop////////////////////////////////void loop
 void loop() 
 {
-//CO2 
-  float ppm = gasSensor.getPPM();
-  Serial.println(ppm);
-  delay(500);  
-//CO2 
-  
 
+float humd = sht20.readHumidity();
+float temp = sht20.readTemperature();
+int valueH = humd  + 0.5;
+int valueT = temp  + 0.5;
+  
+//CO2 
+float ppm = gasSensor.getPPM();
+delay(500);  
+//CO2 
 
 //PMS3003
- readPMS3003();
-
-
+readPMS3003();
 SensorData = "Dust sensor\n" "PM1 - " + String(pmcf10)   +  " mkg/m3 \n" + "PM2.5 - " + String(pmcf25) +  " mkg/m3 \n" + "PM10 - " + String(pmcf100);
 
 SensorData = SensorData + " mkg/m3 \n PM2.5 ";
   if ( pmcf25 >= 0 && pmcf25 < 50) {    SensorData = SensorData + "Good";  }
-  if ( pmcf25 >= 51 && pmcf25 < 100) {    SensorData = SensorData + "Moderate";  }
-  if ( pmcf25 >= 101 && pmcf25 < 150) {    SensorData = SensorData + "Unhealthy for Sensitive Groups";  }
-  if ( pmcf25 >= 151 && pmcf25 < 200) {    SensorData = SensorData + "Unhealthy";  }
-  if ( pmcf25 >= 201 && pmcf25 < 300) {    SensorData = SensorData + "Very Unhealthy";  }
-  if ( pmcf25 >= 301) {    SensorData = SensorData + "Hazardous";  }
+  if ( pmcf25 >= 50 && pmcf25 < 100) {    SensorData = SensorData + "Moderate";  }
+  if ( pmcf25 >= 100 && pmcf25 < 150) {    SensorData = SensorData + "Unhealthy for Sensitive Groups";  }
+  if ( pmcf25 >= 150 && pmcf25 < 200) {    SensorData = SensorData + "Unhealthy";  }
+  if ( pmcf25 >= 200 && pmcf25 < 300) {    SensorData = SensorData + "Very Unhealthy";  }
+  if ( pmcf25 >= 300) {    SensorData = SensorData + "Hazardous";  }
 
   SensorData = SensorData + "\n PM10 ";
   if ( pmcf100 >= 0 && pmcf100 < 54) {    SensorData = SensorData + "Good";  }
-  if ( pmcf100 >= 55 && pmcf100 < 154) {    SensorData = SensorData + "Moderate";  }
-  if ( pmcf100 >= 155 && pmcf100 < 254) {    SensorData = SensorData + "Unhealthy for Sensitive Groups";  }
-  if ( pmcf100 >= 255 && pmcf100 < 354) {    SensorData = SensorData + "Unhealthy";  }
-  if ( pmcf100 >= 355 && pmcf100 < 424) {    SensorData = SensorData + "Very Unhealthy";  }
-  if ( pmcf100 >= 425) {    SensorData = SensorData + "Hazardous";  }
+  if ( pmcf100 >= 54 && pmcf100 < 154) {    SensorData = SensorData + "Moderate";  }
+  if ( pmcf100 >= 154 && pmcf100 < 254) {    SensorData = SensorData + "Unhealthy for Sensitive Groups";  }
+  if ( pmcf100 >= 254 && pmcf100 < 354) {    SensorData = SensorData + "Unhealthy";  }
+  if ( pmcf100 >= 354 && pmcf100 < 424) {    SensorData = SensorData + "Very Unhealthy";  }
+  if ( pmcf100 >= 424) {    SensorData = SensorData + "Hazardous";  }
 
- SensorData = SensorData + "\n CO2 " + ppm;
+SensorData = SensorData + "\n CO2 " + ppm;
   if( ppm >= 0 && ppm < 0.25) { SensorData = SensorData + " Normal";}
   if( ppm >= 0.26 && ppm < 1) { SensorData = SensorData + " Attention";}
   if( ppm >= 1 ){ SensorData = SensorData + " Hazard";};
-
+SensorData = SensorData + "\n \n Temperature " + valueT  + "C \n Humidity " + valueH  + "%";
 
  delay(1000); //READING_SENSOR_INTERVAL
  firstLoop = false;
 //PMS3003
 
-
 //limit checking
 //Normal
-  if (( pmcf25 >= 0 && pmcf25 < 50)    || ( pmcf100 >= 0 && pmcf100 < 54)    || ( ppm >= 0 && ppm < 0.25) )  //Normal
+  if (( pmcf25 >= 0 && pmcf25 < 50)    || ( pmcf100 >= 0 && pmcf100 < 54)    || ( ppm >= 0 && ppm < 0.45) )  //Normal
   {
     LED ("Green");
     ChangeTrackingNew = 1;
-
     AutoSend = "It back to normal \n \n" + SensorData;
   } 
   
 //Attention
-  if (( pmcf25 >= 51 && pmcf25 < 150)  || ( pmcf100 >= 55 && pmcf100 < 254)  || ( ppm >= 0.26 && ppm < 1) ) //Attention
+  if (( pmcf25 >= 51 && pmcf25 < 150)  || ( pmcf100 >= 55 && pmcf100 < 254)  || ( ppm >= 0.45 && ppm < 1.5) ) //Attention
   {
     LED ("Blue");
     ChangeTrackingNew = 2;
@@ -177,59 +184,53 @@ SensorData = SensorData + " mkg/m3 \n PM2.5 ";
   {
     LED ("Red");
     ChangeTrackingNew = 3;
-     AutoSend = "Hazard \n \n" + SensorData;
+    AutoSend = "Hazard \n \n" + SensorData;
    }
-
-   
 //limit checking
-//change checking
 
+//change checking
 if (ChangeTrackingNew != ChangeTrackingOld)
 {
-  Serial.println("AutoSend");
-    String chat_id = String(bot.messages[0].chat_id);
-    if (chat_id == "") chat_id =  my_chat_id;
-    bot.sendMessage(chat_id, AutoSend);
+  Serial.println("Auto message");
+  String chat_id = String(bot.messages[0].chat_id);
+  bot.sendMessage(chat_id, AutoSend);
 }
-
 ChangeTrackingOld = ChangeTrackingNew;
 //change checking
 
-
-  //telegram
+//telegram
     if (millis() > Bot_lasttime + Bot_mtbs)  {
       int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
   
       while(numNewMessages) {
-        Serial.println("got response");
+        Serial.println("got request for data");
         handleNewMessages(numNewMessages);
         numNewMessages = bot.getUpdates(bot.last_message_received + 1);
       }
       Bot_lasttime = millis();
     }
-  //telegram
+//telegram
+
 }
 
 /////////////////////////////Send Message////////////////////////////////Send Message
 void handleNewMessages(int numNewMessages) 
 {
-  Serial.println("NewMessages");
+  Serial.println("Making data response");
 
   for (int i=0; i<numNewMessages; i++) {
     String chat_id = String(bot.messages[i].chat_id);
     String text = bot.messages[i].text;
-
     String from_name = bot.messages[i].from_name;
     if (from_name == "") from_name = "Guest";
 
     if (text == "/sensor") {
       bot.sendMessage(chat_id, SensorData);
-       Serial.println("chat_id " + chat_id);
     }
-        if (text == "/start") {
-      bot.sendMessage(chat_id, "Hi I'm EcoAir \n Stay with me if you want to know about dust and CO2 concentration in my location \n Use /sensor \n for check it manually or keep calm and wait for automatic updates");     
+
+    if (text == "/start") {
+      bot.sendMessage(chat_id,  "Hi I'm EcoAir \n Stay with me if you want to know about dust and CO2 concentration in my location \n Use /sensor \n for check it manually or keep calm and wait for automatic updates");       
     }
-    
   }
 }
 
