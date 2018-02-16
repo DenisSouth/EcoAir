@@ -88,9 +88,9 @@ delay(500);
 LED ("Green");
 delay(500);  
 
-digitalWrite(Red_LED, HIGH); //led off
-digitalWrite(Blue_LED, HIGH);  //led off
-digitalWrite(Green_LED, HIGH);  //led off
+digitalWrite(Red_LED, LOW); //led off
+digitalWrite(Blue_LED, LOW);  //led off
+digitalWrite(Green_LED, LOW);  //led off
 //LED
 
   Serial.begin(115200);
@@ -279,23 +279,23 @@ void readPMS3003() {
 void LED(String ledname) 
 {
       if (ledname == "Red")
-    {digitalWrite(Red_LED, LOW); //led off
-    digitalWrite(Blue_LED, HIGH);  //led off
-    digitalWrite(Green_LED, HIGH);  //led off
+    {digitalWrite(Red_LED, HIGH);
+    digitalWrite(Blue_LED, LOW);
+    digitalWrite(Green_LED, LOW);
     }
         
         if (ledname == "Green")
     {
-    digitalWrite(Red_LED, HIGH); //led off
-    digitalWrite(Blue_LED, HIGH);  //led off
-    digitalWrite(Green_LED, LOW);  //led off
+    digitalWrite(Red_LED, LOW);
+    digitalWrite(Blue_LED, LOW);
+    digitalWrite(Green_LED, HIGH);
     }
     
       if (ledname == "Blue")
     {
-    digitalWrite(Red_LED, HIGH); //led off
-    digitalWrite(Blue_LED, LOW);  //led off
-    digitalWrite(Green_LED, HIGH);  //led off
+    digitalWrite(Red_LED, LOW);
+    digitalWrite(Blue_LED, HIGH);
+    digitalWrite(Green_LED, LOW);
     }
 }
 ///////////////////////led////////////////////////////////////////////////////////
