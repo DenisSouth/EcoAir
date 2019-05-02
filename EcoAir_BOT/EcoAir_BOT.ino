@@ -14,8 +14,8 @@ SHT20    sht20;
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
 char ssid[] = "AndroidAP";     // your network SSID (name)
-char password[] = "12345777"; // your network key
-#define BOTtoken "526357899:AAHBHTnCqcXLjfnrY9ITOVGEMdWdRgBmdW4"  // your Bot Token (Get from Botfather)
+char password[] = "1234567"; // your network key
+#define BOTtoken "12345:123123123123"  // your Bot Token (Get from Botfather)
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
 int Bot_mtbs = 1000; //mean time between scan messages
@@ -65,8 +65,6 @@ int ChangeTrackingNew = 0;
 String AutoSend;
 
 String SensorData;
-
-//String my_chat_id ="292126439";
 
 /////////////////////////////void setup////////////////////////////////void setup
 void setup() {
